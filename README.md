@@ -1,16 +1,35 @@
-Exercício 10
-Após compreender a diferença entre container e volume, execute:
+Aula 21/08/2026:
 
-docker compose down -v
-Suba novamente:
+instalar o mysql2;
+utilizar a Promise API do MySQL2;
+criar um pool de conexões;
+utilizar variáveis de ambiente;
+utilizar process.env;
+proteger o .env;
+criar um .env.example;
+testar a comunicação com o banco;
+separar configuração da aplicação e inicialização do servidor;
+compreender a diferença entre localhost e o nome de serviço do Docker.
 
-docker compose up -d
-Verifique o que aconteceu com:
+--
+Exercício 1
+Altere temporariamente a senha do banco no .env.
 
-Tabela
-Dados
-Banco
-Explique o resultado.
+Observe o erro retornado.
 
-Ao derrubar o volume (comando incluindo "-v"; docker compose down -v) os dados não persistidos são apagados, e com isso perde-se todos os dados e todas as tabelas criadas e até então salvas em disco.
-Os dados persistentes do MySQL estavam armazenados nesse volume, logo todas as tabelas e dados criados anteriormente são apagados. Mas observe que quando roda o docker compose up -d, um novo volume é criado e o banco é criado novamente, mas sem os dados e tabelas que existiam anteriormente por que estes não está no arquivo de configuração (foram criados via comandos de SQL pelo usuário).
+Depois restaure a senha correta.
+
+Exercício 2
+Altere o nome do banco e observe o comportamento.
+
+Exercício 3
+Utilizando o pool, execute temporariamente no server.js:
+
+const [rows] = await pool.query('SELECT * FROM alunos')
+
+console.log(rows)
+Confira os registros no terminal.
+
+Depois remova esse código.
+
+A consulta não deverá permanecer no server.js, pois consultas relacionadas a alunos terão uma camada específica no próximo tutorial.
