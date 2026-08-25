@@ -1,43 +1,57 @@
-Aula 21/08/2026:
+Aula 25/08/2026:
 
-instalar o mysql2;
-utilizar a Promise API do MySQL2;
-criar um pool de conexões;
-utilizar variáveis de ambiente;
-utilizar process.env;
-proteger o .env;
-criar um .env.example;
-testar a comunicação com o banco;
-separar configuração da aplicação e inicialização do servidor;
-compreender a diferença entre localhost e o nome de serviço do Docker.
-
---
 Exercício 1
-Altere temporariamente a senha do banco no .env.
+Teste os cinco endpoints:
 
-Observe o erro retornado. Depois restaure a senha correta.
+POST   /alunos
+GET    /alunos
+GET    /alunos/:id
+PUT    /alunos/:id
+DELETE /alunos/:id
 
-R: Mensagem do terminal: Restarting 'src/server.js' Não foi possível conectar ao banco de dados Access denied for user 'api_user'@'172.18.0.1' (using password: YES) Failed running 'src/server.js'. Waiting for file changes before restarting...
-Restaurando a senha, e usando o npm run dev funcionou tudo certinho.
+R: Tudo funcionando.
 
 Exercício 2
-Altere o nome do banco e observe o comportamento.
+Cadastre três alunos.
 
-R: Mensagem do terminal: Não foi possível conectar ao banco de dados
-Access denied for user 'api_user'@'%' to database 'api_resthdhh'
+Reinicie o servidor Node.js.
+
+Consulte:
+
+GET /alunos
+Explique por que os dados continuam existindo.
+
+R:Os dados continuam existindo por que agora estão gravados no mySQL. Reiniciar a aplicação só reinicia o servidor, isso não apaga o banco e os dados gravados nele.
 
 Exercício 3
-Utilizando o pool, execute temporariamente no server.js:
+Pare e remova o container:
 
-const [rows] = await pool.query('SELECT * FROM alunos')
+docker compose down
+Suba novamente:
 
-console.log(rows)
-Confira os registros no terminal.
+docker compose up -d
+Confira os dados.
 
-Depois remova esse código.
+Explique o papel do Docker Volume.
 
-A consulta não deverá permanecer no server.js, pois consultas relacionadas a alunos terão uma camada específica no próximo tutorial.
+R: O comando "docker compose down" sem o "-v" não remove o volume (onde os dados estão gravados), o que preserva os dados salvos. Quando o novo container sobe, ele reutiliza esse volume.
 
-R: retornou [], pois a tabela existe, mas está vazia:
-Restarting 'src/server.js' [] Conexão com o MySQL estabelecida Servidor rodando em http://localhost:3000
-Sem a linha: "const [rows] = await pool.query('SELECT * FROM alunos')", server.js volta só a inicializar a aplicação e validar a conexão com o banco, sem carregar consultas específicas.
+Exercício 4
+Tente buscar:
+
+GET /alunos/999
+Explique por que o 404 pertence ao Controller e não ao Repository.
+
+R: O Repository apenas consulta os dados e retorna o resultado ou null, ele não tem e nem deve ter acesso as requisições, os resultados e os status HTTP que ficam separados na camada do controller.
+
+Exercício 5
+Remova temporariamente:
+
+WHERE id = ?
+do DELETE.
+
+Não execute a requisição.
+
+Analise o SQL e explique o problema que isso causaria.
+
+R: Delete sem where ia "destruir" dos dados do banco de dados, mandando-os para SP (saco preto).
