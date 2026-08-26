@@ -1,0 +1,18 @@
+info:
+  name: Pesquisar-curso
+  type: http
+
+http:
+  method: GET
+  url: http://localhost:3000/alunos?curso=ADS
+  params:
+    - name: curso
+      value: ADS
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,17 +1,16 @@
 info:
-  name: Atualizar-Aluno
+  name: Cadastrar-Aluno-V2
   type: http
-  seq: 1
 
 http:
-  method: PUT
-  url: http://localhost:3000/alunos/1
+  method: POST
+  url: http://localhost:3000/alunos
   body:
     type: json
     data: |-
       {
-        "nome": "Pedro Silva",
-        "curso": "Sistemas de Informação",
+        "nome": "Pedro",
+        "curso": "ADS",
         "cpf": "12345678901"
       }
   auth: inherit

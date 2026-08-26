@@ -1,47 +1,76 @@
 import pool from '../database/pool.js'
 
 class AlunoRepository {
-  async findAll() {
-    const [rows] = await pool.execute(
-      'SELECT id, nome, curso FROM alunos ORDER BY id'
-    )
+  async findAll({ nome, curso } = {}) {
+  let sql = 'SELECT id, nome, curso, cpf FROM alunos'
+  const params = []
 
-    return rows
+  const conditions = []
+
+  if (nome) {
+    conditions.push('nome LIKE ?')
+    params.push(`%${nome}%`)
   }
+
+  if (curso) {
+    conditions.push('curso LIKE ?')
+    params.push(`%${curso}%`)
+  }
+
+  if (conditions.length > 0) {
+    sql += ` WHERE ${conditions.join(' AND ')}`
+  }
+
+  sql += ' ORDER BY id'
+
+  const [rows] = await pool.execute(sql, params)
+
+  return rows
+}
 
   async findById(id) {
     const [rows] = await pool.execute(
-      'SELECT id, nome, curso FROM alunos WHERE id = ?',
+      'SELECT id, nome, curso, cpf FROM alunos WHERE id = ?',
       [id]
     )
 
     return rows[0] ?? null
   }
 
-  async create({ nome, curso }) {
+  async findByCpf(cpf) {
+    const [rows] = await pool.execute(
+      'SELECT id, nome, curso, cpf FROM alunos WHERE cpf = ?',
+      [cpf]
+    )
+
+    return rows[0] ?? null
+  }
+
+  async create({ nome, curso, cpf }) {
     const [result] = await pool.execute(
       `
-        INSERT INTO alunos (nome, curso)
-        VALUES (?, ?)
+        INSERT INTO alunos (nome, curso, cpf)
+        VALUES (?, ?, ?)
       `,
-      [nome, curso]
+      [nome, curso, cpf]
     )
 
     return {
       id: result.insertId,
       nome,
-      curso
+      curso,
+      cpf
     }
   }
 
-  async update(id, { nome, curso }) {
+  async update(id, { nome, curso, cpf }) {
     const [result] = await pool.execute(
       `
         UPDATE alunos
-        SET nome = ?, curso = ?
+        SET nome = ?, curso = ?, cpf = ?
         WHERE id = ?
       `,
-      [nome, curso, id]
+      [nome, curso, cpf, id]
     )
 
     if (result.affectedRows === 0) {

@@ -1,57 +1,36 @@
-Aula 25/08/2026:
+## Incrementos adicionais
 
-Exercício 1
-Teste os cinco endpoints:
+Após a implementação do CRUD utilizando a arquitetura em camadas, foram realizados dois incrementos adicionais no projeto.
 
-POST   /alunos
-GET    /alunos
-GET    /alunos/:id
-PUT    /alunos/:id
-DELETE /alunos/:id
+### 1. Camada Service e regras de negócio para CPF
 
-R: Tudo funcionando.
+Foi adicionada a camada `Service`, alterando a arquitetura para:
 
-Exercício 2
-Cadastre três alunos.
+Route → Controller → Service → Repository → MySQL
 
-Reinicie o servidor Node.js.
+A camada `Service` passou a concentrar as regras de negócio da aplicação.
 
-Consulte:
+Também foi adicionado o campo `cpf` ao cadastro de alunos, com as seguintes regras:
 
-GET /alunos
-Explique por que os dados continuam existindo.
+- nome, curso e CPF são obrigatórios;
+- CPF deve possuir exatamente 11 dígitos;
+- CPF deve ser único;
+- durante uma atualização, o aluno pode manter o próprio CPF.
 
-R:Os dados continuam existindo por que agora estão gravados no mySQL. Reiniciar a aplicação só reinicia o servidor, isso não apaga o banco e os dados gravados nele.
+A tabela `alunos` também passou a utilizar a restrição `UNIQUE` para o campo CPF, reforçando a integridade dos dados no banco.
 
-Exercício 3
-Pare e remova o container:
+### 2. Busca de alunos por nome e curso
 
-docker compose down
-Suba novamente:
+Foi implementada a possibilidade de filtrar a listagem de alunos utilizando parâmetros de consulta (`query parameters`).
 
-docker compose up -d
-Confira os dados.
+Exemplos:
 
-Explique o papel do Docker Volume.
+GET /alunos?nome=Maria
 
-R: O comando "docker compose down" sem o "-v" não remove o volume (onde os dados estão gravados), o que preserva os dados salvos. Quando o novo container sobe, ele reutiliza esse volume.
+GET /alunos?curso=ADS
 
-Exercício 4
-Tente buscar:
+GET /alunos?nome=Maria&curso=ADS
 
-GET /alunos/999
-Explique por que o 404 pertence ao Controller e não ao Repository.
+Quando nenhum parâmetro é informado, `GET /alunos` continua retornando todos os alunos.
 
-R: O Repository apenas consulta os dados e retorna o resultado ou null, ele não tem e nem deve ter acesso as requisições, os resultados e os status HTTP que ficam separados na camada do controller.
-
-Exercício 5
-Remova temporariamente:
-
-WHERE id = ?
-do DELETE.
-
-Não execute a requisição.
-
-Analise o SQL e explique o problema que isso causaria.
-
-R: Delete sem where ia "destruir" dos dados do banco de dados, mandando-os para SP (saco preto).
+A busca utiliza `LIKE` no Repository e parâmetros preparados, permitindo pesquisas parciais sem interpolar diretamente os valores recebidos na instrução SQL.
